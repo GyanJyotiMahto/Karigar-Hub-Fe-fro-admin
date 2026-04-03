@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, Hammer, Package,
@@ -18,6 +19,10 @@ const navItems = [
 ];
 
 export default function AdminSidebar({ open, onClose }) {
+  const { logout } = useAdminAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => { logout(); navigate('/admin/login'); };
   return (
     <>
       <AnimatePresence>
@@ -175,6 +180,7 @@ export default function AdminSidebar({ open, onClose }) {
           </div>
 
           <motion.button
+            onClick={handleLogout}
             whileHover={{ backgroundColor: '#FEF2F2' }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
             style={{ color: '#94A3B8' }}>

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Menu, Search, Bell, ChevronDown, LogOut, Settings, User, Check, Download, Calendar } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 const pageMeta = {
   '/admin':           { title: 'Dashboard',  sub: 'Overview of your platform'       },
@@ -42,7 +43,11 @@ export default function AdminTopbar({ onMenuClick }) {
   const [dateOpen, setDateOpen]   = useState(false);
   const [dateRange, setDateRange] = useState('Last 7 days');
   const [notifs, setNotifs]       = useState(notifications);
+  const { logout } = useAdminAuth();
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const handleLogout = () => { logout(); navigate('/admin/login'); };
   const page     = pageMeta[location.pathname] || { title: 'Admin', sub: '' };
   const unread   = notifs.filter(n => n.unread).length;
   const dropRef  = useRef(null);
@@ -266,7 +271,7 @@ export default function AdminTopbar({ onMenuClick }) {
                   </button>
                 ))}
                 <div style={{ borderTop: '1px solid #F1F5F9' }}>
-                  <button onClick={() => setDropOpen(false)}
+                  <button onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-500 transition-colors"
                     onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
                     onMouseLeave={e => e.currentTarget.style.background = 'white'}>
