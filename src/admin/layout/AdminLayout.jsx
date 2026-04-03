@@ -9,15 +9,7 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#F1F5F9', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
-      `}</style>
+    <div className="min-h-screen flex" style={{ background: '#F1F5F9' }}>
 
       <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
