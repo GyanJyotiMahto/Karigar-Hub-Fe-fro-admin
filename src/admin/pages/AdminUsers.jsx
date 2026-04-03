@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, Ban } from 'lucide-react';
+import { Trash2, Users } from 'lucide-react';
 import { getUsers, deleteUser } from '../../services/adminApi';
-import { StatusBadge, DeleteModal, TableCard, Th, Tr, Td, EmptyState, FilterTabs, PageHeader, SearchInput, ActionBtn } from '../components/AdminUI';
+import {
+  StatusBadge, DeleteModal, TableCard, Th, Tr, Td,
+  EmptyState, FilterTabs, PageHeader, SearchInput, ActionBtn, SkeletonRow,
+} from '../components/AdminUI';
 
 const tabs = [
   { value: 'all',   label: 'All Users' },
@@ -31,7 +34,9 @@ export default function AdminUsers() {
 
   const filtered = useMemo(() => users
     .filter(u => filter === 'all' || (u.role || 'user') === filter)
-    .filter(u => !search || u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())),
+    .filter(u => !search ||
+      u.name?.toLowerCase().includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase())),
     [users, filter, search]
   );
 
@@ -44,76 +49,77 @@ export default function AdminUsers() {
   };
 
   return (
-    <div>
-      <PageHeader title="Users" sub={`${users.length} registered users on the platform`}>
-        <SearchInput value={search} onChange={setSearch} placeholder="Search name or email..." />
+    <div className="space-y-6">
+      <PageHeader
+        title="Users"
+        sub={`${users.length} registered users on the platform`}
+        icon={Users}
+      >
+        <SearchInput value={search} onChange={setSearch} placeholder="Search name or email…" />
       </PageHeader>
 
-      <div className="mb-6 overflow-x-auto pb-1">
-        <FilterTabs tabs={tabsWithCount} active={filter} onChange={setFilter} />
-      </div>
+      <FilterTabs tabs={tabsWithCount} active={filter} onChange={setFilter} />
 
-      {loading ? (
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(232,213,176,0.4)' }} />)}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyState icon="👤" message="No users found" sub="Try adjusting your search or filter" />
-      ) : (
-        <TableCard>
-          <thead>
+      <TableCard>
+        <thead>
+          <tr>
+            <Th>User</Th>
+            <Th>Email</Th>
+            <Th>Phone</Th>
+            <Th>Location</Th>
+            <Th>Role</Th>
+            <Th>Joined</Th>
+            <Th>Actions</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            [...Array(5)].map((_, i) => <SkeletonRow key={i} cols={7} />)
+          ) : filtered.length === 0 ? (
             <tr>
-              <Th>User</Th>
-              <Th>Email</Th>
-              <Th>Phone</Th>
-              <Th>Location</Th>
-              <Th>Role</Th>
-              <Th>Joined</Th>
-              <Th>Actions</Th>
+              <td colSpan={7}>
+                <EmptyState icon="👤" message="No users found" sub="Try adjusting your search or filter" />
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filtered.map((user, i) => {
-              const initials = user.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
-              return (
-                <Tr key={user._id}>
-                  <Td>
-                    <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04 }} className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl overflow-hidden bg-[#3B82F6] flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                        {user.profileImage ? <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" /> : initials}
-                      </div>
-                      <p className="font-semibold text-[#1A0A02] text-sm whitespace-nowrap">{user.name}</p>
-                    </motion.div>
-                  </Td>
-                  <Td className="text-xs font-medium" style={{ color: '#7B5C3A' }}>{user.email}</Td>
-                  <Td className="text-xs font-medium" style={{ color: '#7B5C3A' }}>{user.phone || '—'}</Td>
-                  <Td>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-lg"
-                      style={{ background: '#F5ECD8', color: '#7B5C3A' }}>
-                      {user.address?.city || user.address?.state || '—'}
-                    </span>
-                  </Td>
-                  <Td>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                      {user.role || 'user'}
-                    </span>
-                  </Td>
-                  <Td className="text-xs font-medium whitespace-nowrap" style={{ color: '#9B7A52' }}>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : '—'}
-                  </Td>
-                  <Td>
-                    <div className="flex items-center gap-0.5">
-                      <ActionBtn variant="danger" icon={Trash2} title="Delete user" onClick={() => setDelete(user)} />
+          ) : filtered.map((user, i) => {
+            const initials = user.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+            return (
+              <Tr key={user._id}>
+                <Td>
+                  <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }} className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 2px 8px rgba(99,102,241,0.25)' }}>
+                      {user.profileImage
+                        ? <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover rounded-xl" />
+                        : initials}
                     </div>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </tbody>
-        </TableCard>
-      )}
+                    <span className="font-semibold text-slate-800 text-sm whitespace-nowrap">{user.name}</span>
+                  </motion.div>
+                </Td>
+                <Td className="text-slate-500 text-xs">{user.email}</Td>
+                <Td className="text-slate-500 text-xs">{user.phone || '—'}</Td>
+                <Td>
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
+                    {user.address?.city || user.address?.state || '—'}
+                  </span>
+                </Td>
+                <Td>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                    {user.role || 'user'}
+                  </span>
+                </Td>
+                <Td className="text-slate-400 text-xs whitespace-nowrap">
+                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : '—'}
+                </Td>
+                <Td>
+                  <ActionBtn variant="danger" icon={Trash2} title="Delete user" onClick={() => setDelete(user)} />
+                </Td>
+              </Tr>
+            );
+          })}
+        </tbody>
+      </TableCard>
 
       <DeleteModal open={!!deleteTarget} onClose={() => setDelete(null)} onConfirm={handleDelete} label={deleteTarget?.name} />
     </div>

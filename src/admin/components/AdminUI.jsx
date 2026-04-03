@@ -199,12 +199,20 @@ export function PageWrapper({ children }) {
 }
 
 // ── Page Header ───────────────────────────────────────────────────────────────
-export function PageHeader({ title, sub, children }) {
+export function PageHeader({ title, sub, icon: Icon, children }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-10">
-      <div>
-        <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">{title}</h2>
-        {sub && <p className="text-sm mt-1.5 font-semibold text-indigo-400">{sub}</p>}
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        {Icon && (
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 4px 14px rgba(99,102,241,0.3)' }}>
+            <Icon size={18} color="white" strokeWidth={2} />
+          </div>
+        )}
+        <div>
+          <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">{title}</h2>
+          {sub && <p className="text-xs mt-0.5 font-semibold text-indigo-400">{sub}</p>}
+        </div>
       </div>
       {children && <div className="flex items-center gap-2.5 flex-shrink-0">{children}</div>}
     </div>

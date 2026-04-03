@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Package } from 'lucide-react';
 import { getProducts, deleteProduct } from '../../services/adminApi';
 import { DeleteModal, EmptyState, FilterTabs, PageHeader, SearchInput } from '../components/AdminUI';
 
@@ -27,7 +27,9 @@ export default function AdminProducts() {
 
   const filtered = useMemo(() => products
     .filter(p => category === 'All' || p.category === category)
-    .filter(p => !search || p.name?.toLowerCase().includes(search.toLowerCase()) || p.artist?.name?.toLowerCase().includes(search.toLowerCase())),
+    .filter(p => !search ||
+      p.name?.toLowerCase().includes(search.toLowerCase()) ||
+      p.artist?.name?.toLowerCase().includes(search.toLowerCase())),
     [products, category, search]
   );
 
@@ -40,68 +42,68 @@ export default function AdminProducts() {
   };
 
   return (
-    <div>
-      <PageHeader title="Products" sub={`${products.length} total products`}>
-        <SearchInput value={search} onChange={setSearch} placeholder="Search product or artisan..." />
+    <div className="space-y-6">
+      <PageHeader title="Products" sub={`${products.length} total products`} icon={Package}>
+        <SearchInput value={search} onChange={setSearch} placeholder="Search product or artisan…" />
       </PageHeader>
 
-      <div className="mb-6 overflow-x-auto pb-1">
-        <FilterTabs tabs={catTabs} active={category} onChange={setCategory} />
-      </div>
+      <FilterTabs tabs={catTabs} active={category} onChange={setCategory} />
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-64 rounded-2xl animate-pulse" style={{ background: 'rgba(232,213,176,0.4)' }} />
+            <div key={i} className="h-64 rounded-2xl animate-pulse bg-slate-200" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState icon="📦" message="No products found" sub="Try a different category or search term" />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <AnimatePresence mode="popLayout">
             {filtered.map((product, i) => (
               <motion.div key={product._id} layout
-                initial={{ opacity: 0, scale: 0.93 }} animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.93 }}
-                transition={{ delay: i * 0.04, type: 'spring', stiffness: 300, damping: 26 }}
-                whileHover={{ y: -6 }}
-                className="group rounded-2xl overflow-hidden"
-                style={{ background: 'white', border: '1px solid rgba(232,213,176,0.35)', boxShadow: '0 2px 0 rgba(232,213,176,0.4), 0 4px 20px rgba(44,26,14,0.06)' }}>
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: i * 0.03, type: 'spring', stiffness: 300, damping: 26 }}
+                whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(15,23,42,0.1)' }}
+                className="rounded-2xl overflow-hidden bg-white"
+                style={{ border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.05)' }}>
+
                 {/* Image */}
-                <div className="relative h-44 overflow-hidden bg-[#F5ECD8]">
+                <div className="relative h-44 overflow-hidden bg-slate-100">
                   {product.images?.[0] ? (
                     <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">🎨</div>
+                    <div className="w-full h-full flex items-center justify-center text-4xl text-slate-300">🎨</div>
                   )}
-                  <span className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-1 rounded-lg"
-                    style={{ background: 'rgba(251,245,236,0.9)', color: '#7B5C3A' }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-lg"
+                    style={{ background: 'rgba(255,255,255,0.92)', color: '#475569' }}>
                     {product.category}
                   </span>
-                  <span className={`absolute top-2.5 right-2.5 w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
+                  <span className={`absolute top-3 right-3 w-2.5 h-2.5 rounded-full border-2 border-white ${product.stock > 0 ? 'bg-emerald-400' : 'bg-red-400'}`} />
                 </div>
+
                 {/* Info */}
-                <div className="p-5">
-                  <p className="font-bold text-[#1A0A02] text-sm leading-snug truncate mb-0.5">{product.name}</p>
-                  <p className="text-xs font-medium mb-3 truncate" style={{ color: '#9B7A52' }}>
+                <div className="p-4">
+                  <p className="font-bold text-slate-800 text-sm leading-snug truncate">{product.name}</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5 mb-3 truncate">
                     by {product.artist?.name || '—'}
                   </p>
                   <div className="flex items-center justify-between">
-                    <p className="font-bold text-[#C0522B] text-lg">₹{product.price?.toLocaleString('en-IN')}</p>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {product.stock > 0 ? `${product.stock} left` : 'Out of stock'}
-                      </span>
-                      <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
-                        onClick={() => setDelete(product)}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ color: '#C0B090' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.08)'; e.currentTarget.style.color = '#F43F5E'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C0B090'; }}>
-                        <Trash2 size={14} />
-                      </motion.button>
+                    <div>
+                      <p className="font-extrabold text-indigo-600 text-base">₹{product.price?.toLocaleString('en-IN')}</p>
+                      <p className={`text-[10px] font-bold mt-0.5 ${product.stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                      </p>
                     </div>
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
+                      onClick={() => setDelete(product)}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors text-slate-300"
+                      onMouseEnter={e => { e.currentTarget.style.background = '#FFF1F2'; e.currentTarget.style.color = '#F43F5E'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CBD5E1'; }}>
+                      <Trash2 size={14} />
+                    </motion.button>
                   </div>
                 </div>
               </motion.div>
