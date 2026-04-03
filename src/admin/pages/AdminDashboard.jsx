@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Users, Hammer, ShoppingBag, IndianRupee,
-  TrendingUp, TrendingDown, Monitor, Smartphone, Tablet,
+  TrendingUp, TrendingDown,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -13,8 +13,8 @@ import {
 import { getStats, getKarigars, getOrders } from '../../services/adminApi';
 import { StatusBadge } from '../components/AdminUI';
 import { Link } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
-/* ─── Card style ─────────────────────────────────────────────── */
 const card = {
   background: 'white',
   border: '1px solid #E2E8F0',
@@ -22,7 +22,6 @@ const card = {
   boxShadow: '0 2px 12px rgba(15,23,42,0.06)',
 };
 
-/* ─── Custom chart tooltip ───────────────────────────────────── */
 function ChartTip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -36,7 +35,6 @@ function ChartTip({ active, payload, label }) {
   );
 }
 
-/* ─── Stat card ──────────────────────────────────────────────── */
 function StatCard({ title, value, icon: Icon, gradient, growth, delay }) {
   const positive = growth >= 0;
   return (
@@ -48,11 +46,8 @@ function StatCard({ title, value, icon: Icon, gradient, growth, delay }) {
       className="relative overflow-hidden cursor-default select-none"
       style={{ ...card, minHeight: 148 }}
     >
-      {/* Gradient top bar */}
       <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{ background: gradient }} />
-      {/* Soft tint wash */}
       <div className="absolute inset-0 opacity-[0.03] rounded-2xl" style={{ background: gradient }} />
-      {/* Decorative blob */}
       <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full opacity-[0.07]"
         style={{ background: gradient }} />
 
@@ -81,7 +76,6 @@ function StatCard({ title, value, icon: Icon, gradient, growth, delay }) {
   );
 }
 
-/* ─── White card wrapper ─────────────────────────────────────── */
 function Card({ children, className = '', style = {} }) {
   return (
     <div className={`overflow-hidden ${className}`} style={{ ...card, ...style }}>
@@ -103,7 +97,6 @@ function CardHeader({ title, sub, action }) {
   );
 }
 
-/* ─── Static data ────────────────────────────────────────────── */
 const trendData = [
   { month: 'Jan', orders: 12, revenue: 18 },
   { month: 'Feb', orders: 19, revenue: 27 },
@@ -124,14 +117,8 @@ const categoryData = [
 
 const PIE_COLORS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b'];
 
-const deviceData = [
-  { label: 'Desktop', pct: 58, icon: Monitor,    color: '#6366f1' },
-  { label: 'Mobile',  pct: 32, icon: Smartphone,  color: '#8b5cf6' },
-  { label: 'Tablet',  pct: 10, icon: Tablet,      color: '#10b981' },
-];
-
-/* ─── Main ───────────────────────────────────────────────────── */
 export default function AdminDashboard() {
+  const { admin } = useAdminAuth();
   const [stats, setStats]       = useState({ totalUsers: 0, totalKarigars: 0, totalProducts: 0, totalOrders: 0, totalRevenue: 0 });
   const [karigars, setKarigars] = useState([]);
   const [orders, setOrders]     = useState([]);
@@ -156,10 +143,10 @@ export default function AdminDashboard() {
   ];
 
   const statCards = [
-    { title: 'Total Users',    value: stats.totalUsers.toLocaleString('en-IN'),      icon: Users,       gradient: 'linear-gradient(135deg,#6366f1,#4338ca)', growth: 12,  delay: 0    },
-    { title: 'Total Karigars', value: stats.totalKarigars.toLocaleString('en-IN'),   icon: Hammer,      gradient: 'linear-gradient(135deg,#8b5cf6,#6d28d9)', growth: 8,   delay: 0.07 },
-    { title: 'Total Orders',   value: stats.totalOrders.toLocaleString('en-IN'),     icon: ShoppingBag, gradient: 'linear-gradient(135deg,#10b981,#059669)', growth: 23,  delay: 0.14 },
-    { title: 'Total Revenue',  value: `₹${(stats.totalRevenue/1000).toFixed(1)}k`,   icon: IndianRupee, gradient: 'linear-gradient(135deg,#f59e0b,#d97706)', growth: -3,  delay: 0.21 },
+    { title: 'Total Users',    value: stats.totalUsers.toLocaleString('en-IN'),    icon: Users,       gradient: 'linear-gradient(135deg,#6366f1,#4338ca)', growth: 12,  delay: 0    },
+    { title: 'Total Karigars', value: stats.totalKarigars.toLocaleString('en-IN'), icon: Hammer,      gradient: 'linear-gradient(135deg,#8b5cf6,#6d28d9)', growth: 8,   delay: 0.07 },
+    { title: 'Total Orders',   value: stats.totalOrders.toLocaleString('en-IN'),   icon: ShoppingBag, gradient: 'linear-gradient(135deg,#10b981,#059669)', growth: 23,  delay: 0.14 },
+    { title: 'Total Revenue',  value: `₹${(stats.totalRevenue / 1000).toFixed(1)}k`, icon: IndianRupee, gradient: 'linear-gradient(135deg,#f59e0b,#d97706)', growth: -3,  delay: 0.21 },
   ];
 
   const activityFeed = [
@@ -172,7 +159,7 @@ export default function AdminDashboard() {
     })),
     ...karigars.slice(0, 3).map(k => ({
       id: 'k_' + k._id,
-      icon: '🧑🎨',
+      icon: '🧑‍🎨',
       text: `${k.name} registered as a karigar`,
       time: k.createdAt ? new Date(k.createdAt).toLocaleDateString('en-IN') : '—',
       color: '#6366f1',
@@ -182,15 +169,15 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
 
-      {/* ── Heading ── */}
+      {/* Heading */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h2>
         <p className="text-sm mt-1.5 font-semibold text-indigo-400">
-          Welcome back, ArtX — here's what's happening today
+          Welcome back{admin?.name ? `, ${admin.name}` : ''} — here's what's happening today
         </p>
       </motion.div>
 
-      {/* ── Stat Cards ── */}
+      {/* Stat Cards */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
@@ -203,7 +190,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* ── Charts Row 1: Line + Donut ── */}
+      {/* Charts Row: Line + Donut */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
@@ -260,95 +247,35 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* ── Charts Row 2: Bar + Session/Device ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* Bar Chart */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.44 }}>
+        <Card>
+          <CardHeader title="Sales by Category" sub="Top performing craft categories" />
+          <div className="p-6">
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={categoryData} barSize={36} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94A3B8', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#CBD5E1' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTip />} />
+                <Bar dataKey="sales" name="Sales" radius={[8, 8, 0, 0]}
+                  fill="url(#barGradLight)" animationBegin={300} animationDuration={900} />
+                <defs>
+                  <linearGradient id="barGradLight" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.7} />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.44 }}
-          className="xl:col-span-2">
-          <Card>
-            <CardHeader title="Sales by Category" sub="Top performing craft categories" />
-            <div className="p-6">
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={categoryData} barSize={36} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94A3B8', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#CBD5E1' }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTip />} />
-                  <Bar dataKey="sales" name="Sales" radius={[8, 8, 0, 0]}
-                    fill="url(#barGradLight)" animationBegin={300} animationDuration={900} />
-                  <defs>
-                    <linearGradient id="barGradLight" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.7} />
-                    </linearGradient>
-                  </defs>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </motion.div>
+      {/* Orders Table + Activity Feed */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="flex flex-col gap-4">
-
-          {/* Session stats */}
-          <Card>
-            <CardHeader title="Session Stats" sub="Today's activity" />
-            <div className="p-5 space-y-4">
-              {[
-                { label: 'Active Sessions', value: '142',    color: '#6366f1', pct: 72 },
-                { label: 'Avg. Duration',   value: '4m 32s', color: '#8b5cf6', pct: 55 },
-                { label: 'Bounce Rate',     value: '28%',    color: '#10b981', pct: 28 },
-              ].map(s => (
-                <div key={s.label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-slate-500">{s.label}</span>
-                    <span className="text-xs font-bold" style={{ color: s.color }}>{s.value}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full overflow-hidden bg-slate-100">
-                    <motion.div
-                      initial={{ width: 0 }} animate={{ width: `${s.pct}%` }}
-                      transition={{ delay: 0.6, duration: 0.8, ease: 'easeOut' }}
-                      className="h-full rounded-full" style={{ background: s.color }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Device stats */}
-          <Card>
-            <CardHeader title="Device Breakdown" />
-            <div className="p-5 space-y-3">
-              {deviceData.map(d => (
-                <div key={d.label} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${d.color}14` }}>
-                    <d.icon size={15} style={{ color: d.color }} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-slate-500">{d.label}</span>
-                      <span className="text-xs font-bold" style={{ color: d.color }}>{d.pct}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full overflow-hidden bg-slate-100">
-                      <motion.div
-                        initial={{ width: 0 }} animate={{ width: `${d.pct}%` }}
-                        transition={{ delay: 0.7, duration: 0.8, ease: 'easeOut' }}
-                        className="h-full rounded-full" style={{ background: d.color }} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* ── Orders Table + Activity Feed ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           className="xl:col-span-2">
           <Card>
             <CardHeader
@@ -380,7 +307,7 @@ export default function AdminDashboard() {
                     {orders.slice(0, 7).map((order, i) => (
                       <motion.tr key={order._id}
                         initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.6 + i * 0.04 }}
+                        transition={{ delay: 0.55 + i * 0.04 }}
                         className="transition-colors cursor-default"
                         style={{ borderBottom: '1px solid #F8FAFC' }}
                         onMouseEnter={e => e.currentTarget.style.background = '#F8FAFF'}
@@ -408,7 +335,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Activity Feed */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
           <Card style={{ height: '100%' }}>
             <CardHeader title="Activity Feed" sub="Latest platform events"
               action={
@@ -427,7 +354,7 @@ export default function AdminDashboard() {
                 activityFeed.map((act, i) => (
                   <motion.div key={act.id}
                     initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.65 + i * 0.06, type: 'spring', stiffness: 260, damping: 24 }}
+                    transition={{ delay: 0.6 + i * 0.06, type: 'spring', stiffness: 260, damping: 24 }}
                     className="flex items-start gap-3 p-3 rounded-xl transition-colors cursor-default"
                     onMouseEnter={e => e.currentTarget.style.background = '#F8FAFF'}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>

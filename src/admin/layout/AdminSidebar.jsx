@@ -1,28 +1,32 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../context/AdminAuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, Hammer, Package,
-  ShoppingBag, Activity, LogOut, Settings,
-  Star, RotateCcw,
+  ShoppingBag, Activity, LogOut, Settings, Star, RotateCcw,
 } from 'lucide-react';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 const navItems = [
-  { to: '/admin',          icon: LayoutDashboard, label: 'Dashboard', end: true  },
-  { to: '/admin/users',    icon: Users,           label: 'Users',     badge: null },
-  { to: '/admin/karigars', icon: Hammer,          label: 'Karigars',  badge: 2   },
-  { to: '/admin/products', icon: Package,         label: 'Products',  badge: null },
-  { to: '/admin/orders',   icon: ShoppingBag,     label: 'Orders',    badge: 5   },
-  { to: '/admin/reviews',  icon: Star,            label: 'Reviews',   badge: null },
-  { to: '/admin/returns',  icon: RotateCcw,       label: 'Returns',   badge: null },
-  { to: '/admin/activity', icon: Activity,        label: 'Activity',  badge: null },
+  { to: '/admin',          icon: LayoutDashboard, label: 'Dashboard', end: true },
+  { to: '/admin/users',    icon: Users,           label: 'Users'               },
+  { to: '/admin/karigars', icon: Hammer,          label: 'Karigars'            },
+  { to: '/admin/products', icon: Package,         label: 'Products'            },
+  { to: '/admin/orders',   icon: ShoppingBag,     label: 'Orders'              },
+  { to: '/admin/reviews',  icon: Star,            label: 'Reviews'             },
+  { to: '/admin/returns',  icon: RotateCcw,       label: 'Returns'             },
+  { to: '/admin/activity', icon: Activity,        label: 'Activity'            },
 ];
 
 export default function AdminSidebar({ open, onClose }) {
-  const { logout } = useAdminAuth();
+  const { admin, logout } = useAdminAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate('/admin/login'); };
+
+  const initials = admin?.name
+    ? admin.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'A';
+
   return (
     <>
       <AnimatePresence>
@@ -46,11 +50,10 @@ export default function AdminSidebar({ open, onClose }) {
           boxShadow: '4px 0 24px rgba(15,23,42,0.06)',
         }}
       >
-        {/* Indigo top accent line */}
         <div className="absolute top-0 left-0 right-0 h-0.5"
           style={{ background: 'linear-gradient(90deg, #6366f1, #8b5cf6)' }} />
 
-        {/* ── Logo ── */}
+        {/* Logo */}
         <div className="px-6 py-6 flex-shrink-0" style={{ borderBottom: '1px solid #F1F5F9' }}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
@@ -67,34 +70,32 @@ export default function AdminSidebar({ open, onClose }) {
           </div>
         </div>
 
-        {/* ── Admin profile ── */}
+        {/* Admin profile */}
         <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #F1F5F9' }}>
           <div className="flex items-center gap-3 px-3 py-3 rounded-2xl"
             style={{ background: '#F8FAFF', border: '1px solid #E0E7FF' }}>
             <div className="relative flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&q=80"
-                alt="Admin"
-                className="w-9 h-9 rounded-xl object-cover"
-                style={{ boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}
-              />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+                style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 0 0 2px rgba(99,102,241,0.3)' }}>
+                {initials}
+              </div>
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400"
                 style={{ border: '2px solid white' }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-800 truncate">ArtX Admin</p>
+              <p className="text-sm font-semibold text-slate-800 truncate">{admin?.name || 'Admin'}</p>
               <p className="text-[11px] truncate mt-0.5 font-medium" style={{ color: '#6366f1' }}>Super Admin</p>
             </div>
           </div>
         </div>
 
-        {/* ── Navigation ── */}
+        {/* Navigation */}
         <nav className="flex-1 px-3 py-5 overflow-y-auto">
           <p className="px-3 mb-3 text-[10px] font-bold tracking-[0.2em] uppercase select-none text-slate-400">
             Main Menu
           </p>
           <div className="space-y-1">
-            {navItems.map(({ to, icon: Icon, label, end, badge }) => (
+            {navItems.map(({ to, icon: Icon, label, end }) => (
               <NavLink key={to} to={to} end={end} onClick={onClose} className="block">
                 {({ isActive }) => (
                   <motion.div
@@ -119,25 +120,11 @@ export default function AdminSidebar({ open, onClose }) {
                         style={{ background: 'linear-gradient(180deg, #6366f1, #8b5cf6)' }}
                       />
                     )}
-
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={isActive
-                        ? { background: '#E0E7FF' }
-                        : { background: '#F8FAFC' }
-                      }>
-                      <Icon size={16}
-                        style={isActive ? { color: '#6366f1' } : { color: '#94A3B8' }}
-                      />
+                      style={isActive ? { background: '#E0E7FF' } : { background: '#F8FAFC' }}>
+                      <Icon size={16} style={isActive ? { color: '#6366f1' } : { color: '#94A3B8' }} />
                     </div>
-
                     <span className="flex-1">{label}</span>
-
-                    {badge && (
-                      <span className="min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
-                        style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
-                        {badge}
-                      </span>
-                    )}
                   </motion.div>
                 )}
               </NavLink>
@@ -163,22 +150,8 @@ export default function AdminSidebar({ open, onClose }) {
           </div>
         </nav>
 
-        {/* ── Bottom stats + logout ── */}
+        {/* Sign out */}
         <div className="px-4 pb-6 pt-4 flex-shrink-0" style={{ borderTop: '1px solid #F1F5F9' }}>
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {[
-              { label: 'Users',   val: '1.2k' },
-              { label: 'Orders',  val: '8.6k' },
-              { label: 'Revenue', val: '₹42L' },
-            ].map(s => (
-              <div key={s.label} className="flex flex-col items-center py-2.5 rounded-xl"
-                style={{ background: '#F8FAFF', border: '1px solid #E0E7FF' }}>
-                <p className="text-xs font-bold text-slate-700">{s.val}</p>
-                <p className="text-[9px] mt-0.5 font-semibold" style={{ color: '#6366f1' }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-
           <motion.button
             onClick={handleLogout}
             whileHover={{ backgroundColor: '#FEF2F2' }}
