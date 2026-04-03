@@ -296,14 +296,14 @@ export function Th({ children, className = '' }) {
 
 export function Tr({ children, onClick }) {
   return (
-    <motion.tr
-      whileHover={{ backgroundColor: '#F8FAFF' }}
-      transition={{ duration: 0.12 }}
+    <tr
       onClick={onClick}
       className="cursor-default"
-      style={{ borderBottom: '1px solid #F8FAFC' }}>
+      style={{ borderBottom: '1px solid #F8FAFC', transition: 'background-color 0s' }}
+      onMouseEnter={e => e.currentTarget.style.backgroundColor = '#F8FAFF'}
+      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
       {children}
-    </motion.tr>
+    </tr>
   );
 }
 

@@ -10,6 +10,7 @@ import AdminOrders from './admin/pages/AdminOrders';
 import AdminActivity from './admin/pages/AdminActivity';
 import AdminReviews from './admin/pages/AdminReviews';
 import AdminReturns from './admin/pages/AdminReturns';
+import AdminSettings from './admin/pages/AdminSettings';
 
 function ProtectedRoute({ children }) {
   const { admin } = useAdminAuth();
@@ -34,6 +35,7 @@ function AppRoutes() {
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="returns" element={<AdminReturns />} />
         <Route path="activity" element={<AdminActivity />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
