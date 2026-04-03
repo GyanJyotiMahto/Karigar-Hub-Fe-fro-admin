@@ -79,12 +79,7 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <div className="mt-6 p-4 rounded-xl text-center text-xs text-[#9B7A52]"
-          style={{ background: '#FDF6EC', border: '1px solid rgba(232,213,176,0.5)' }}>
-          <p className="font-semibold text-[#1A0A02] mb-1">Admin Credentials</p>
-          <p>Email: <span className="font-mono text-[#C0522B]">admin@karigarhub.com</span></p>
-          <p>Password: <span className="font-mono text-[#C0522B]">Admin@123</span></p>
-        </div>
+
       </motion.div>
     </div>
   );
